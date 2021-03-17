@@ -1,0 +1,7 @@
+/home/silas/testg4/teste/MPD/MPD-build/CMakeFiles/install/strip.dir
+/home/silas/testg4/teste/MPD/MPD-build/CMakeFiles/install/local.dir
+/home/silas/testg4/teste/MPD/MPD-build/CMakeFiles/install.dir
+/home/silas/testg4/teste/MPD/MPD-build/CMakeFiles/list_install_components.dir
+/home/silas/testg4/teste/MPD/MPD-build/CMakeFiles/rebuild_cache.dir
+/home/silas/testg4/teste/MPD/MPD-build/CMakeFiles/edit_cache.dir
+/home/silas/testg4/teste/MPD/MPD-build/CMakeFiles/mpd.dir
