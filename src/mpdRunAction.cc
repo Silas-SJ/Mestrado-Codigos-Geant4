@@ -68,18 +68,34 @@ mpdRunAction::mpdRunAction()
   // Creating ntuple
   //
   analysisManager->CreateNtuple("mpd", "Edep and TrackL");
-  analysisManager->CreateNtupleDColumn("Eabs");
-  analysisManager->CreateNtupleDColumn("Egap");
-  analysisManager->CreateNtupleDColumn("Labs");
-  analysisManager->CreateNtupleDColumn("Lgap");
-  analysisManager->CreateNtupleIColumn("scintPiondecay");
-  analysisManager->CreateNtupleIColumn("detabsPiondecay");
-  analysisManager->CreateNtupleIColumn("scintMuondecay");
-  analysisManager->CreateNtupleIColumn("detabsMuondecay");
-  analysisManager->CreateNtupleDColumn("Layer");
-  analysisManager->CreateNtupleDColumn("EvID");
-  analysisManager->CreateNtupleDColumn("absopiondecay");
-  analysisManager->CreateNtupleDColumn("gappiondecay");
+  analysisManager->CreateNtupleDColumn("Eabs"); // 0
+  analysisManager->CreateNtupleDColumn("Egap"); // 1
+  analysisManager->CreateNtupleDColumn("Labs"); // 2
+  analysisManager->CreateNtupleDColumn("Lgap"); // 3
+  analysisManager->CreateNtupleIColumn("scintPiondecay");  // 4
+  analysisManager->CreateNtupleIColumn("scintPionEnergy"); // 5
+  analysisManager->CreateNtupleIColumn("detabsPiondecay"); // 6
+  analysisManager->CreateNtupleIColumn("detabsPionEnergy"); // 7
+  analysisManager->CreateNtupleIColumn("scintMuondecay");  // 8
+  analysisManager->CreateNtupleIColumn("detabsMuondecay");  // 9
+  analysisManager->CreateNtupleDColumn("Layer");  // 10
+  analysisManager->CreateNtupleDColumn("EvID");  // 11
+  analysisManager->CreateNtupleDColumn("absopiondecay");  // 12
+  analysisManager->CreateNtupleDColumn("gappiondecay");  // 13
+  analysisManager->CreateNtupleDColumn("theta"); // 14
+  analysisManager->CreateNtupleDColumn("phi");  // 15
+  analysisManager->CreateNtupleDColumn("energy");  // 16
+  analysisManager->CreateNtupleDColumn("px");  // 17
+  analysisManager->CreateNtupleDColumn("py");  // 18
+  analysisManager->CreateNtupleDColumn("pz");  // 19
+  analysisManager->CreateNtupleDColumn("x");   // 20
+  analysisManager->CreateNtupleDColumn("y");   // 21
+  analysisManager->CreateNtupleDColumn("z");   // 22
+  analysisManager->CreateNtupleDColumn("scintPionPassed");  // 23
+  analysisManager->CreateNtupleDColumn("detabsPionPassed");  // 24
+  analysisManager->CreateNtupleDColumn("gapPionPassed");  // 25
+  analysisManager->CreateNtupleDColumn("scintPionCapture"); //26
+  analysisManager->CreateNtupleDColumn("detabsPionCapture"); // 27
   analysisManager->FinishNtuple();
 }
 

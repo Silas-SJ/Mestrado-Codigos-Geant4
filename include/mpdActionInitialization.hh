@@ -23,64 +23,34 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
-/// \file mpdPrimaryGeneratorAction.hh
-/// \brief Definition of the mpdPrimaryGeneratorAction class
+//
+/// \file mpdActionInitialization.hh
+/// \brief Definition of the mpdActionInitialization class
 
-#ifndef mpdPrimaryGeneratorAction_h
-#define mpdPrimaryGeneratorAction_h 1
+#ifndef mpdActionInitialization_h
+#define mpdActionInitialization_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "globals.hh"
+#include "G4VUserActionInitialization.hh"
 
-
-class G4ParticleGun;
-class G4Event;
-class mpdDetectorConstruction;
-
-/// The primary generator action class with particle gun.
+/// Action initialization class.
 ///
-/// It defines a single particle which hits the calorimeter 
-/// perpendicular to the input face. The type of the particle
-/// can be changed via the G4 build-in commands of G4ParticleGun class 
-/// (see the macros provided with this example).
-
-class mpdPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class mpdDetectorConstruction;
+//class mpdPrimaryGeneratorAction;
+class mpdActionInitialization : public G4VUserActionInitialization
 {
-public:
-  mpdPrimaryGeneratorAction(mpdDetectorConstruction* detconst);
-  virtual ~mpdPrimaryGeneratorAction();
+  public:
+   mpdActionInitialization(mpdDetectorConstruction*);
+  //  mpdActionInitialization(mpdPrimaryGeneratorAction* primgen);
+    virtual ~mpdActionInitialization();
 
-  virtual void GeneratePrimaries(G4Event* event);
-  
-  // set methods
-  void SetRandomFlag(G4bool value);
+    virtual void BuildForMaster() const;
+    virtual void Build() const;
 
-   G4double GetEnergyPrimary() { return gunenergy; }
-   G4double GetMomentumX() { return pX; }
-   G4double GetMomentumY() { return pY; }
-   G4double GetMomentumZ() { return pZ; }
-   G4double GetPositionX() { return X; }
-   G4double GetPositionY() { return Y; }
-   G4double GetPositionZ() { return Z; }
-   G4double GetTheta() { return Theta; }
-   G4double GetPhi()   { return Phi; }
-private:
-  G4ParticleGun*  fParticleGun; // G4 particle gunß
-    mpdDetectorConstruction* DetConst;
-    G4double thetabin[200];
-    G4double gunenergy;
-    G4double pX;
-    G4double pY;
-    G4double pZ;
-    G4double X;
-    G4double Y;
-    G4double Z;
-    G4double Theta;
-    G4double Phi;
-   
+ private:
+  mpdDetectorConstruction* DetConst;
+   // mpdPrimaryGeneratorAction* PrimGen;
 };
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 #endif
+
+    

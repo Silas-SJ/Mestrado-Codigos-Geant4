@@ -41,11 +41,11 @@
 /// In EndOfEventAction(), it prints the accumulated quantities of the energy 
 /// deposit and track lengths of charged particles in Absober and Gap layers 
 /// stored in the hits collections.
-
+class mpdPrimaryGeneratorAction;
 class mpdEventAction : public G4UserEventAction
 {
 public:
-  mpdEventAction();
+  mpdEventAction(mpdPrimaryGeneratorAction* ga);
   virtual ~mpdEventAction();
 
   virtual void  BeginOfEventAction(const G4Event* event);
@@ -57,7 +57,8 @@ private:
                                             const G4Event* event) const;
   void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
                             G4double gapEdep, G4double gapTrackLength) const;
-  
+ 
+  mpdPrimaryGeneratorAction* genaction; 
   // data members                   
   G4int  fAbsHCID;
   G4int  fGapHCID;

@@ -31,6 +31,7 @@
 #include "mpdCalorimeterSD.hh"
 #include "mpdCalorHit.hh"
 #include "mpdAnalysis.hh"
+#include "mpdPrimaryGeneratorAction.hh"
 
 #include "G4RunManager.hh"
 #include "G4Event.hh"
@@ -43,8 +44,8 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mpdEventAction::mpdEventAction()
- : G4UserEventAction(),
+mpdEventAction::mpdEventAction(mpdPrimaryGeneratorAction* ga)
+ : G4UserEventAction(),genaction(ga),
    fAbsHCID(-1),
    fGapHCID(-1),
    fScintHCID(-1),
@@ -162,14 +163,29 @@ void mpdEventAction::EndOfEventAction(const G4Event* event)
    analysisManager->FillNtupleDColumn(2, absoHitlayer->GetTrackLength());
    analysisManager->FillNtupleDColumn(3, gapHitlayer->GetTrackLength());
    analysisManager->FillNtupleIColumn(4, scintHitlayer->GetPionDecay());
-   analysisManager->FillNtupleIColumn(5, detabsHitlayer->GetPionDecay());
-   analysisManager->FillNtupleIColumn(6, scintHitlayer->GetMuonDecay());
-   analysisManager->FillNtupleIColumn(7, detabsHitlayer->GetMuonDecay());
-   analysisManager->FillNtupleDColumn(8, absoHitlayer->GetLayerID());
-   analysisManager->FillNtupleDColumn(9, eventID);
-   analysisManager->FillNtupleDColumn(10, absoHitlayer->GetPionDecay());
-   analysisManager->FillNtupleDColumn(11, gapHitlayer->GetPionDecay());
-
+   analysisManager->FillNtupleIColumn(5, scintHitlayer->GetEdep());
+   analysisManager->FillNtupleIColumn(6, detabsHitlayer->GetPionDecay());
+   analysisManager->FillNtupleIColumn(7, detabsHitlayer->GetEdep());
+   analysisManager->FillNtupleIColumn(8, scintHitlayer->GetMuonDecay());
+   analysisManager->FillNtupleIColumn(9, detabsHitlayer->GetMuonDecay());
+   analysisManager->FillNtupleDColumn(10, absoHitlayer->GetLayerID());
+   analysisManager->FillNtupleDColumn(11, eventID);
+   analysisManager->FillNtupleDColumn(12, absoHitlayer->GetPionDecay());
+   analysisManager->FillNtupleDColumn(13, gapHitlayer->GetPionDecay());
+   analysisManager->FillNtupleDColumn(14, genaction->GetTheta());
+   analysisManager->FillNtupleDColumn(15, genaction->GetPhi());
+   analysisManager->FillNtupleDColumn(16, genaction->GetEnergyPrimary());
+   analysisManager->FillNtupleDColumn(17, genaction->GetMomentumX());
+   analysisManager->FillNtupleDColumn(18, genaction->GetMomentumY());
+   analysisManager->FillNtupleDColumn(19, genaction->GetMomentumZ());
+   analysisManager->FillNtupleDColumn(20, genaction->GetPositionX());
+   analysisManager->FillNtupleDColumn(21, genaction->GetPositionY());
+   analysisManager->FillNtupleDColumn(22, genaction->GetPositionZ());
+   analysisManager->FillNtupleDColumn(23, scintHitlayer->GetPionPassed());
+   analysisManager->FillNtupleDColumn(24, detabsHitlayer->GetPionPassed());
+   analysisManager->FillNtupleDColumn(25, gapHitlayer->GetPionPassed());
+   analysisManager->FillNtupleDColumn(26, scintHitlayer->GetPionCapture());
+   analysisManager->FillNtupleDColumn(27, detabsHitlayer->GetPionCapture());
    analysisManager->AddNtupleRow();
   }
 }  

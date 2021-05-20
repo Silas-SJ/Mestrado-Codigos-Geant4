@@ -60,20 +60,25 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 mpdPrimaryGeneratorAction::mpdPrimaryGeneratorAction(mpdDetectorConstruction* da)
-//: G4VUserPrimaryGeneratorAction(), DetConst(da),
- : fParticleGun(nullptr),DetConst(da)
+//: G4VUserPrimaryGeneratorAction(), DetConst(da)
+: fParticleGun(nullptr),DetConst(da)
 {
-  G4int nofParticles = 100;
+  G4int nofParticles = 1;
   fParticleGun = new G4ParticleGun(nofParticles);
 
   // default particle kinematic
-  //
+  
   auto particleDefinition 
     = G4ParticleTable::GetParticleTable()->FindParticle("pi+");
-  fParticleGun->SetParticleDefinition(particleDefinition);
+    //G4ParticleTable::GetParticleTable()->FindParticle("pi-");
+   fParticleGun->SetParticleDefinition(particleDefinition);
   //fParticleGun->SetParticlePosition(G4ThreeVector(100., 30., -38.));
   //fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  fParticleGun->SetParticleEnergy(2.*GeV);
+  fParticleGun->SetParticleEnergy(10.*MeV);
+  for (int n = 0; n < 150; n++)
+  { 
+    thetabin[n] = cos((M_PI/2.*n)/200.)*cos((M_PI/2.*n)/200.);
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -101,7 +106,7 @@ void mpdPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   if (  worldLV ) {
     worldBox = dynamic_cast<G4Box*>(worldLV->GetSolid());
   }
-
+  
   if ( worldBox ) {
     worldZHalfLength = worldBox->GetZHalfLength();  
   }
@@ -113,59 +118,52 @@ void mpdPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     G4Exception("mpdPrimaryGeneratorAction::GeneratePrimaries()",
       "MyCode0002", JustWarning, msg);
   } 
+  /*
+  ///::::::Randomizando o momento das pariculas:::::::: ///
   
-//  G4double taxa = 450.;
- // G4double worldX = 200.*m; //276
- // G4double worldY = 20.*m;  // 30
- // G4double worldZ = 38.*m;  //43.2
-  //G4double r = std::sqrt(pow(worldX,2) + pow(worldY,2) + pow(worldZ,2)); 
- // G4double r = worldZHalfLength + 25.*m;
-//   for(int i = 0; i<taxa;i++){ 
-//    G4double costheta =  2.*G4UniformRand()-1.0;
-    G4double costheta =  G4UniformRand();
+     //G4double costheta =  G4UniformRand();
+    CLHEP::RandGeneral muonDist(thetabin,200);
+    Theta = muonDist.shoot()*M_PI/2;
+    G4double costheta = cos(Theta); 
     G4double sintheta = std::sqrt(1. - pow(costheta,2));
-//    G4double phi = -CLHEP::pi + CLHEP::twopi*G4UniformRand();
-    G4double phi = CLHEP::twopi*G4UniformRand();
-    G4double px = sintheta*cos(phi); // 
-    G4double py = sintheta*sin(phi);
-    G4double pz = costheta;
+//    Theta = acos(costheta);
+    Phi = CLHEP::twopi*G4UniformRand();
+    pX = sintheta*cos(Phi); // 
+    pY = sintheta*sin(Phi);
+    pZ = costheta;
 
- std::cout << "px = " << px << "  py = " << py << "  pz = " << pz << std::endl;   
+ std::cout << "px = " << pX << "  py = " << pY << "  pz = " << pZ << std::endl;   
  
-    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px, py, pz));
-    //fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -z));
-//   }
+    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(pX, pY, pZ));
+ */
+    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
+
+    
+//:::::::Randomizando a posicao do canhao::::::::::///
+
+ //  X = -DetConst->GetcalorSizeX()/2-50*(2*G4UniformRand()-1)*m;
+ //  Y = -DetConst->GetcalorSizeY()/2-50*(2*G4UniformRand()-1)*m;
+ //  Z = 1*m - worldZHalfLength; 
    
-   //fParticleGun->SetParticlePosition(G4ThreeVector(x, y, -z)); //(old)
+     X = DetConst->GetdetposX();
+     Y = DetConst->GetdetposY(); 
+     Z = DetConst->Getalturapredio()/2 + DetConst->GetdetposZ() + 19 *cm; 
+   
+ //(teste)  std::cout << "gunX = " << X << "  gunY = " << Y << std::endl; //(old)
+   fParticleGun ->SetParticlePosition(G4ThreeVector(X, Y, Z));
+   
+   
+   // :::::::Randomizando a energia:::::::::: //
+ /*  
+   G4double E0 = 10. *MeV;
+   G4double Ef = 1000. *MeV;
+   G4double energystart = E0 + G4UniformRand() * (Ef - E0) ;
+  // gunenergy = fParticleGun->GetParticleEnergy();
+   fParticleGun->SetParticleEnergy(energystart); //retirado pra teste (voltar com ele)
+   */
+   gunenergy = fParticleGun->GetParticleEnergy();
   
- /* 
-  G4double cos_theta = zenith_PDF->GetRandom();
-    G4double phi = -CLHEP::pi + CLHEP::twopi*G4UniformRand(); //phi uniform in [-pi, pi];
-    G4double sin_theta = std::sqrt(1 - cos_theta*cos_theta);
-    G4double x = sin_theta*cos(phi);
-    G4double y = sin_theta*sin(phi);
-    G4double z = cos_theta;
-  */
   
-  
-  //Set gun position  (old)
-
-//   G4double gunX = -15*m-DetConst->GetcalorSizeX()/2;
-//   G4double gunY = -2*m-DetConst->GetcalorSizeY()/2;
-
-
-   G4double gunX = -DetConst->GetcalorSizeX()/2-50*(2*G4UniformRand()-1)*m;
-   G4double gunY = -DetConst->GetcalorSizeY()/2-50*(2*G4UniformRand()-1)*m;
-
-   std::cout << "gunX = " << gunX << "  gunY = " << gunY << std::endl; //(old)
-  
-  fParticleGun
-   ->SetParticlePosition(G4ThreeVector(gunX, gunY, 1*m - worldZHalfLength));
-  //  ->SetParticlePosition(G4ThreeVector(gunX, gunY , 40.5*m/2));
-  //  ->SetParticlePosition(G4ThreeVector(2*G4UniformRand()*worldBox->GetXHalfLength()-1, 2*G4UniformRand()*worldBox->GetYHalfLength()-1, 0.));
- //   ->SetParticlePosition(G4ThreeVector(0., 0., 0.));
- 
- 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 

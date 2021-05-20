@@ -24,45 +24,14 @@
 // ********************************************************************
 //
 //
-/// \file mpdActionInitialization.cc
-/// \brief Implementation of the mpdActionInitialization class
+/// \file mpdAnalysis.hh
+/// \brief Selection of the analysis technology
 
-#include "mpdActionInitialization.hh"
-#include "mpdPrimaryGeneratorAction.hh"
-#include "mpdDetectorConstruction.hh"
-#include "mpdRunAction.hh"
-#include "mpdEventAction.hh"
+#ifndef mpdAnalysis_h
+#define mpdAnalysis_h 1
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "g4root.hh"
+//#include "g4csv.hh"
+//#include "g4xml.hh"
 
-mpdActionInitialization::mpdActionInitialization(mpdDetectorConstruction* da)
-//mpdActionInitialization::mpdActionInitialization(mpdPrimaryGeneratorAction* ga)
-: G4VUserActionInitialization(), DetConst(da)
-//: PrimGen(ga)
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-mpdActionInitialization::~mpdActionInitialization()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void mpdActionInitialization::BuildForMaster() const
-{
-  SetUserAction(new mpdRunAction);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void mpdActionInitialization::Build() const
-{
-//  SetUserAction(new mpdPrimaryGeneratorAction(DetConst));
- // SetUserAction(PrimGen);
-  auto PrimGen = new mpdPrimaryGeneratorAction(DetConst);
-  SetUserAction(PrimGen);
-  SetUserAction(new mpdRunAction);
-  SetUserAction(new mpdEventAction(PrimGen));
-}  
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#endif
