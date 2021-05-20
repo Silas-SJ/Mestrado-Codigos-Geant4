@@ -66,7 +66,10 @@ class mpdDetectorConstruction : public G4VUserDetectorConstruction
     G4int GetNoLayers() {return fNofLayers;}
     G4double GetcalorSizeX() {return calorSizeX;}
     G4double GetcalorSizeY() {return calorSizeY;}
-    
+    G4double GetdetposX() {return detposX;}
+    G4double GetdetposY() {return detposY;}
+    G4double GetdetposZ() {return detposZ;}
+    G4double Getalturapredio() {return alturapredio;}// gambiarra(usar no primary)
   private:
     // methods
     //
@@ -82,6 +85,10 @@ class mpdDetectorConstruction : public G4VUserDetectorConstruction
     G4int   fNofLayers;     // number of layers
     G4double calorSizeX;
     G4double calorSizeY;
+    G4double detposX;
+    G4double detposY; 
+    G4double detposZ;
+    G4double alturapredio;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

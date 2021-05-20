@@ -64,20 +64,27 @@ class mpdCalorHit : public G4VHit
     void Add(G4double de, G4double dl, G4int layer);
     void AddPionDecay();
     void AddMuonDecay();
+    void AddPionPassed();
+    void AddPionCapture();
 
     // get methods
     G4double GetEdep() const;
     G4double GetTrackLength() const;
     G4int GetPionDecay() const;
     G4int GetMuonDecay() const;
+    G4int GetPionPassed() const; 
+    G4int GetPionCapture() const;
     G4int GetLayerID() const;
     
   private:
     G4double fEdep;        ///< Energy deposit in the sensitive volume
     G4double fTrackLength; ///< Track length in the  sensitive volume
     G4int fPionDecay;
+    G4int fPionPassed; 
+    G4int fPionCapture; 
     G4int fMuonDecay;
     G4int fLayerID;
+    
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -116,6 +123,12 @@ inline void mpdCalorHit::AddPionDecay() {
 }
 inline void mpdCalorHit::AddMuonDecay() {
   fMuonDecay++;
+}  
+inline void mpdCalorHit::AddPionPassed() {
+  fPionPassed++; 
+}
+inline void mpdCalorHit::AddPionCapture() {
+  fPionCapture++; 
 }
 inline G4double mpdCalorHit::GetEdep() const {
   return fEdep;
@@ -125,6 +138,12 @@ inline G4double mpdCalorHit::GetTrackLength() const {
 }
 inline G4int mpdCalorHit::GetPionDecay() const {
   return fPionDecay;
+}
+inline G4int mpdCalorHit::GetPionPassed() const {
+  return fPionPassed; 
+}
+inline G4int mpdCalorHit::GetPionCapture() const {
+  return fPionCapture; 
 }
 inline G4int mpdCalorHit::GetMuonDecay() const {
   return fMuonDecay;

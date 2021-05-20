@@ -109,7 +109,7 @@ void mpdDetectorConstruction::DefineMaterials()
 G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
 {
   // Geometry parameters
-  fNofLayers = 9;
+  fNofLayers = 10;
  // G4double absoThickness = 10.*mm;
  // G4double gapThickness =  5.*mm;
  // G4double calorSizeXY  = 10.*cm;
@@ -124,13 +124,14 @@ G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
     
   G4double detabsThickness = 5.*mm;
   G4double detabsSizeXY  = 40.*cm;
+  alturapredio = (absoThickness + gapThickness) * (fNofLayers + 1); // gambiarra (usar no primary)
  
   auto layerThickness = absoThickness + gapThickness;
   auto calorThickness = fNofLayers * layerThickness;
 //  auto worldSizeX = 1.2 * calorSizeX;
 //  auto worldSizeY = 1.2 * calorSizeY;
-  auto worldSizeX = 500.*m;
-  auto worldSizeY = 200.*m;
+  auto worldSizeX = 500*m;
+  auto worldSizeY = 200*m;
   auto worldSizeZ  = 1.2 * calorThickness; 
   
   // Get materials
@@ -224,7 +225,7 @@ G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
                   false,            // no boolean operation
                   0,                // copy number
                   fCheckOverlaps);  // checking overlaps
-  
+
   new G4PVReplica(
                  "Layer",          // its name
                  layerLV,          // its logical volume
@@ -343,11 +344,15 @@ G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
                    scintS,             // its solid
                    scintMaterial,      // its material
                    "ScintLV");         // its name
-    G4double detposX = 5*m-calorSizeX/2;
-    G4double detposY = 2*m-calorSizeY/2;
+    //G4double detposX = 5*m-calorSizeX/2;
+   // G4double detposY = 2*m-calorSizeY/2;
+     detposX = 5*m-calorSizeX/2;
+     detposY = 2*m-calorSizeY/2;
+     detposZ = scintThickness/2+gapThickness/2-70*cm;
     new G4PVPlacement(                // top scintillator
                    0,                // no rotation
-                   G4ThreeVector(detposX, detposY, scintThickness/2+gapThickness/2-70*cm), // its position
+                   //G4ThreeVector(detposX, detposY, scintThickness/2+gapThickness/2-70*cm), // its position
+                   G4ThreeVector(detposX, detposY, detposZ),
                    scintLV,            // its logical volume
                    "Scint",            // its name
                    gapLV2,          // its mother  volume

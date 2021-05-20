@@ -23,64 +23,56 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// 
-/// \file mpdPrimaryGeneratorAction.hh
-/// \brief Definition of the mpdPrimaryGeneratorAction class
+//
+/// \file mpdCalorimeterSD.hh
+/// \brief Definition of the mpdCalorimeterSD class
 
-#ifndef mpdPrimaryGeneratorAction_h
-#define mpdPrimaryGeneratorAction_h 1
+#ifndef mpdCalorimeterSD_h
+#define mpdCalorimeterSD_h 1
 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "globals.hh"
+#include "G4VSensitiveDetector.hh"
+
+#include "mpdCalorHit.hh"
 
 
-class G4ParticleGun;
-class G4Event;
-class mpdDetectorConstruction;
+#include <vector>
 
-/// The primary generator action class with particle gun.
+class G4Step;
+class G4HCofThisEvent;
+
+/// Calorimeter sensitive detector class
 ///
-/// It defines a single particle which hits the calorimeter 
-/// perpendicular to the input face. The type of the particle
-/// can be changed via the G4 build-in commands of G4ParticleGun class 
-/// (see the macros provided with this example).
-
-class mpdPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+/// In Initialize(), it creates one hit for each calorimeter layer and one more
+/// hit for accounting the total quantities in all layers.
+///
+/// The values are accounted in hits in ProcessHits() function which is called
+/// by Geant4 kernel at each step.
+class mpdCalorimeterSD : public G4VSensitiveDetector
 {
-public:
-  mpdPrimaryGeneratorAction(mpdDetectorConstruction* detconst);
-  virtual ~mpdPrimaryGeneratorAction();
-
-  virtual void GeneratePrimaries(G4Event* event);
+  public:
+    mpdCalorimeterSD(
+                     const G4String& name,
+                     const G4String& hitsCollectionName, 
+                     G4int nofCells);
+    virtual ~mpdCalorimeterSD();
   
-  // set methods
-  void SetRandomFlag(G4bool value);
-
-   G4double GetEnergyPrimary() { return gunenergy; }
-   G4double GetMomentumX() { return pX; }
-   G4double GetMomentumY() { return pY; }
-   G4double GetMomentumZ() { return pZ; }
-   G4double GetPositionX() { return X; }
-   G4double GetPositionY() { return Y; }
-   G4double GetPositionZ() { return Z; }
-   G4double GetTheta() { return Theta; }
-   G4double GetPhi()   { return Phi; }
-private:
-  G4ParticleGun*  fParticleGun; // G4 particle gunß
-    mpdDetectorConstruction* DetConst;
-    G4double thetabin[200];
-    G4double gunenergy;
-    G4double pX;
-    G4double pY;
-    G4double pZ;
-    G4double X;
-    G4double Y;
-    G4double Z;
-    G4double Theta;
-    G4double Phi;
+    // methods from base class
+    virtual void   Initialize(G4HCofThisEvent* hitCollection);
+    virtual G4bool ProcessHits(G4Step* step, G4TouchableHistory* history);
+    virtual void   EndOfEvent(G4HCofThisEvent* hitCollection);
+    
+   public: 
+   G4int oldID;
+   G4int eventID;
    
+  private:
+    mpdCalorHitsCollection* fHitsCollection;
+    G4int  fNofCells;
+    
+    
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+

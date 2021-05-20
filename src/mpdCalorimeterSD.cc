@@ -30,19 +30,25 @@
 #include "mpdCalorimeterSD.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4Step.hh"
+#include "mpdPrimaryGeneratorAction.hh"
+#include "G4Event.hh"
 #include "G4ThreeVector.hh"
 #include "G4SDManager.hh"
 #include "G4ios.hh"
 #include "G4SteppingManager.hh"
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mpdCalorimeterSD::mpdCalorimeterSD(
-                            const G4String& name, 
-                            const G4String& hitsCollectionName,
-                            G4int nofCells)
- : G4VSensitiveDetector(name),
-   fHitsCollection(nullptr),
+#include "G4RunManager.hh"
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+ mpdCalorimeterSD::mpdCalorimeterSD(
+                                    const G4String& name, 
+                                    const G4String& hitsCollectionName,
+                                    G4int nofCells
+                                    )
+ : G4VSensitiveDetector(name), 
+   fHitsCollection(nullptr), 
    fNofCells(nofCells)
+
+
 {
   collectionName.insert(hitsCollectionName);
 }
@@ -52,6 +58,7 @@ mpdCalorimeterSD::mpdCalorimeterSD(
 mpdCalorimeterSD::~mpdCalorimeterSD()
 { 
 }
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -71,8 +78,16 @@ void mpdCalorimeterSD::Initialize(G4HCofThisEvent* hce)
   for (G4int i=0; i<fNofCells+1; i++ ) {
     fHitsCollection->insert(new mpdCalorHit());
   }
+  
+   G4RunManager *rm = G4RunManager::GetRunManager();
+   eventID= rm->GetCurrentEvent()->GetEventID();
+   
+   oldID = -9999;
+ //std::cout << "Valor TrackID " << oldID << std::endl;
 }
 
+ 
+ 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4bool mpdCalorimeterSD::ProcessHits(G4Step* step,
@@ -84,7 +99,6 @@ G4bool mpdCalorimeterSD::ProcessHits(G4Step* step,
     
   auto edep = step->GetTotalEnergyDeposit();
 
-    
   // step length
   G4double stepLength = 0.;
   if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
@@ -114,32 +128,93 @@ G4bool mpdCalorimeterSD::ProcessHits(G4Step* step,
     = (*fHitsCollection)[fHitsCollection->entries()-1];
   auto piondecay = false;
   auto muondecay = false;
-  if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
+  auto pionpassed= false; 
+  auto pioncapture= false; 
+  
+  // ::::::: Number of pions that captured at rest :::::::::: //
+  if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="hBertiniCaptureAtRest" && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
+      pioncapture=true;
+      hit->AddPionCapture();
+    }
+ 
+// ::::::: Number of different pions that passed :::::::::: //
+
+  if (step->GetTrack()->GetTrackID() != oldID && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
+    pionpassed=true;
+    hit->AddPionPassed();
+   oldID = step->GetTrack()->GetTrackID();
+ //(teste)   std::cout << "Valor TrackID " << oldID << std::endl;
+   }
+   
+   if (eventID == 23664)
+  {
+    std::cout << "Valor EventID: " << eventID << std::endl;
+    std::cout << "Valor TrackID: " << step->GetTrack()->GetTrackID() << std::endl;
+    if (step->GetPreStepPoint()->GetProcessDefinedStep() && step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName())
+    {
+      std::cout << "PreStep Process: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+    }
+    if (step->GetPostStepPoint()->GetProcessDefinedStep() && step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName())
+    {
+      std::cout << "PostStep Process: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+    }
+  }
+// if (eventID == 1100){
+  //std::cout << "Valor EventID: " << eventID << std::endl;
+ // std::cout << "Valor TrackID: " << step->GetTrack()->GetTrackID() << std::endl;
+ //std::cout << "PreStep Process: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+ // std::cout << "PostStep Process: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+ // }
+   //Add values
+ // if ( edep==0. && stepLength == 0. ){
+    hit->Add(edep, stepLength, layerNumber);
+    hitTotal->Add(edep, stepLength, layerNumber); 
+    
+ // :::::::Number of pions and muons that decay :::::::::: //
+   if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
       piondecay=true;
-      std::cout << "pion decay at layer " << layerNumber << std::endl;
+      hit->AddPionDecay();
+//(teste)      std::cout << "pion decay at layer " << layerNumber << std::endl;
+  std::cout << "pion decay:" << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
     }
-  if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 13){
+  else if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 13){
       muondecay=true;
-      std::cout << "muon decay at layer " << layerNumber << std::endl;
+     hit->AddMuonDecay();
+ //(teste)     std::cout << "muon decay at layer " << layerNumber << std::endl;
+   std::cout << "muon decay:" << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
     }
+    
+/*
   // Add values
  // if ( edep==0. && stepLength == 0. ){
     hit->Add(edep, stepLength, layerNumber);
     hitTotal->Add(edep, stepLength, layerNumber);
     if(piondecay) hit->AddPionDecay();
     if(muondecay) hit->AddMuonDecay();
- // }
-//    std::cout << "Particle: " << step->GetTrack()->GetDefinition()->GetParticleName()<< std::endl;
-//  std::cout << "PreStep Process: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
-// std::cout << "PostStep Process: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
-    if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"){
-        std::cout << "decay at layer " << layerNumber << "  particle: " << step->GetTrack()->GetDefinition()->GetParticleName() << std::endl;
+    if(pionpassed) hit->AddPionPassed();
+    if(pioncapture) hit->AddPionCapture();
+   //}
+   */
+ 
+  /* 
+   // :::::::Process of pion interation:::::::::: //
+   if (step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
+    std::cout << "PreStep Process Pion: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
     }
-/*    if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
-        std::cout << "pion decay at layer " << layerNumber << std::endl;
+    
+   if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
+
+ std::cout << "PostStep Process Pion: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;  
     }
-    if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 13){
-        std::cout << "muon decay at layer " << layerNumber << std::endl;
+*/
+
+// std::cout << "Particle: " << step->GetTrack()->GetDefinition()->GetParticleName()<< std::endl;
+// std::cout << "PreStep Process: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+ //std::cout << "PostStep Process: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+ 
+ /*
+   if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"){
+  std::cout << "decay at layer " << layerNumber << "  particle: " << step->GetTrack()->GetDefinition()->GetParticleName() << std::endl;
     }
  */
   return true;
