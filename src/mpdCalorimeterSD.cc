@@ -81,7 +81,6 @@ void mpdCalorimeterSD::Initialize(G4HCofThisEvent* hce)
   
    G4RunManager *rm = G4RunManager::GetRunManager();
    eventID= rm->GetCurrentEvent()->GetEventID();
-   
    oldID = -9999;
  //std::cout << "Valor TrackID " << oldID << std::endl;
 }
@@ -94,25 +93,21 @@ G4bool mpdCalorimeterSD::ProcessHits(G4Step* step,
                                      G4TouchableHistory*)
 {  
   // energy deposit
-   
- //   if (abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) != 211) return false;
-    
   auto edep = step->GetTotalEnergyDeposit();
 
   // step length
   G4double stepLength = 0.;
   if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
-//    if (abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
     stepLength = step->GetStepLength();
   }
 
- // if ( edep==0. && stepLength == 0. ) return false;
+ // if ( edep==0. && stepLength == 0. ) return false; // It was inactive
 
   auto touchable = (step->GetPreStepPoint()->GetTouchable());
 
   // Get calorimeter cell id 
   auto layerNumber = touchable->GetReplicaNumber(1);
-  //std::cout << "layerNumber: " << layerNumber << std::endl;
+
   // Get hit accounting data for this cell
   auto hit = (*fHitsCollection)[layerNumber];
     
@@ -131,58 +126,125 @@ G4bool mpdCalorimeterSD::ProcessHits(G4Step* step,
   auto pionpassed= false; 
   auto pioncapture= false; 
   
-  // ::::::: Number of pions that captured at rest :::::::::: //
-  if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="hBertiniCaptureAtRest" && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
-      pioncapture=true;
+  ParentID = step->GetTrack()->GetParentID();
+              // ::::::: Number of pions that captured at rest :::::::::: //
+              
+     if (abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211)
+     {
+       if (step->GetPostStepPoint()->GetProcessDefinedStep() && step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="hBertiniCaptureAtRest")
+       {
+          pioncapture=true;
       hit->AddPionCapture();
-    }
+       }
+     }
  
-// ::::::: Number of different pions that passed :::::::::: //
+              // ::::::: Number of different pions that passed :::::::::: //
 
-  if (step->GetTrack()->GetTrackID() != oldID && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
-    pionpassed=true;
-    hit->AddPionPassed();
-   oldID = step->GetTrack()->GetTrackID();
- //(teste)   std::cout << "Valor TrackID " << oldID << std::endl;
-   }
-   
-   if (eventID == 23664)
-  {
-    std::cout << "Valor EventID: " << eventID << std::endl;
-    std::cout << "Valor TrackID: " << step->GetTrack()->GetTrackID() << std::endl;
-    if (step->GetPreStepPoint()->GetProcessDefinedStep() && step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName())
+     if (abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211)
+     {
+       if (step->GetTrack()->GetTrackID() != oldID && ParentID != oldID)
+       {
+         pionpassed=true;
+         hit->AddPionPassed();
+    /*     
+       if (step->GetPreStepPoint()->GetProcessDefinedStep() && step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() && step->GetPostStepPoint()->GetProcessDefinedStep() && step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName())
+      {
+     if (step->GetPreStepPoint()->GetPhysicalVolume() && step->GetPreStepPoint()-> GetPhysicalVolume()->GetName() != "Scint" && step->GetPostStepPoint()->GetPhysicalVolume() && step->GetPostStepPoint()->GetPhysicalVolume()->GetName() != "Scint")
     {
-      std::cout << "PreStep Process: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+    std::cout << "Pion dont passed:" << step->GetPostStepPoint()-> GetPhysicalVolume()->GetName() << std::endl;
+    }
+   }  
+    */
+      }
+       
+      // std::cout << "Pion passed:" << "1" << std::endl;
+      // std::cout << "TrackID_if:" << step->GetTrack()->GetTrackID() << std::endl;
+      // std::cout << "oldID_if:" << oldID << std::endl;
+      // std::cout << "Volume:" << step->GetPostStepPoint()-> GetPhysicalVolume() -> GetName() << std::endl;
+      /*
+     if (step->GetPostStepPoint()->GetPhysicalVolume() && step->GetPostStepPoint()-> GetPhysicalVolume() -> GetName())
+   {
+     std::cout << "Volume:" << step->GetPostStepPoint()-> GetPhysicalVolume() -> GetName() << std::endl;
+    }  
+    
+    if (step->GetPreStepPoint()->GetProcessDefinedStep() && step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName())
+   {
+     std::cout << "PreStep Process_if: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
     }
     if (step->GetPostStepPoint()->GetProcessDefinedStep() && step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName())
     {
-      std::cout << "PostStep Process: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+      std::cout << "PostStep Process_if: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+   
+    }    
+     */  
+      oldID = step->GetTrack()->GetTrackID();
+   }
+  
+     
+     
+   /* 
+            // ::::::: Identify an event:::::::::: //
+        
+   if (eventID == 202 || eventID == 285 || eventID == 402 || eventID == 547 || eventID == 977)
+  {
+   // std::cout << "Valor EventID: " << eventID << std::endl;
+   std::cout << "Particle name: " << step->GetTrack()->GetDefinition()->GetPDGEncoding() << std::endl;
+    std::cout << "Valor TrackID: " << step->GetTrack()->GetTrackID() << std::endl;
+    if (step->GetPreStepPoint()->GetProcessDefinedStep() && step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName())
+    {
+    // std::cout << "Particle name: " << step->GetTrack()->GetDefinition()->GetPDGEncoding() << std::endl;
+      std::cout << "PreStep Process: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+      
+     std::cout << "PreStep Position: " << step->GetPreStepPoint()->GetPosition() << std::endl;
     }
-  }
-// if (eventID == 1100){
-  //std::cout << "Valor EventID: " << eventID << std::endl;
- // std::cout << "Valor TrackID: " << step->GetTrack()->GetTrackID() << std::endl;
- //std::cout << "PreStep Process: " << step->GetPreStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
- // std::cout << "PostStep Process: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
- // }
-   //Add values
- // if ( edep==0. && stepLength == 0. ){
+   
+   // if (step->GetPreStepPoint()->GetPhysicalVolume() && step->GetPreStepPoint()-> GetPhysicalVolume()->GetName())
+   // {
+  //  std::cout << "volume_Pre:" << step->GetPostStepPoint()-> GetPhysicalVolume()->GetName() << std::endl;
+   // }
+    
+    if (step->GetPostStepPoint()->GetProcessDefinedStep() && step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName())
+    {
+     std::cout << "PostStep Process: " << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+     
+     std::cout << "PostStep Position: " << step->GetPostStepPoint()->GetPosition() << std::endl;
+     
+    }
+    if (step->GetPostStepPoint()->GetPhysicalVolume() && step->GetPostStepPoint()->GetPhysicalVolume()->GetName())
+    {
+    std::cout << "volume_Pos:" << step->GetPostStepPoint()-> GetPhysicalVolume()->GetName() << std::endl;
+    }
+  }       
+   */
+
     hit->Add(edep, stepLength, layerNumber);
     hitTotal->Add(edep, stepLength, layerNumber); 
     
+    
  // :::::::Number of pions and muons that decay :::::::::: //
-   if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211){
+ 
+      if (abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 211)
+  {
+      if (step->GetPostStepPoint()->GetProcessDefinedStep() && step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay")
+     {
       piondecay=true;
       hit->AddPionDecay();
-//(teste)      std::cout << "pion decay at layer " << layerNumber << std::endl;
-  std::cout << "pion decay:" << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
-    }
-  else if (step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay"&& abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 13){
+ // std::cout << "pion decay at layer " << layerNumber << std::endl;
+//  std::cout << "pion decay:" << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+     }
+  }
+      else if (abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) && abs(step->GetTrack()->GetDefinition()->GetPDGEncoding()) == 13)
+  {
+      if (step->GetPostStepPoint()->GetProcessDefinedStep() && step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()=="Decay")
+ {
       muondecay=true;
      hit->AddMuonDecay();
  //(teste)     std::cout << "muon decay at layer " << layerNumber << std::endl;
-   std::cout << "muon decay:" << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
+   //std::cout << "muon decay:" << step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() << std::endl;
     }
+  }
+    
+    
     
 /*
   // Add values

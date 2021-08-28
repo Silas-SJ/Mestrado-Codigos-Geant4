@@ -64,6 +64,7 @@ class mpdCalorimeterSD : public G4VSensitiveDetector
    public: 
    G4int oldID;
    G4int eventID;
+   G4int ParentID;
    
   private:
     mpdCalorHitsCollection* fHitsCollection;
