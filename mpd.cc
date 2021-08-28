@@ -28,6 +28,7 @@
 /// \brief Main program of the Muon Pion Detector (MPD - UERJ)
 
 #include "mpdDetectorConstruction.hh"
+#include "mpdPrimaryGeneratorAction.hh"
 #include "mpdActionInitialization.hh"
 
 #ifdef G4MULTITHREADED
@@ -115,12 +116,13 @@ int main(int argc,char** argv)
 
   // Set mandatory initialization classes
   //
-  auto detConstruction = new mpdDetectorConstruction();
-  runManager->SetUserInitialization(detConstruction);
+  auto detConstruction = new mpdDetectorConstruction();           //
+  runManager->SetUserInitialization(detConstruction);             //
+
+//  auto genAction = new mpdPrimaryGeneratorAction(detConstruction);
 
 //  auto physicsList = new FTFP_BERT;
 //  runManager->SetUserInitialization(physicsList);
-  
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
@@ -148,7 +150,12 @@ int main(int argc,char** argv)
       physList = new G4GenericPhysicsList(myConstructors);
     }
   runManager->SetUserInitialization(physList);
+  
+              //
  
+  //auto genAction = new mpdPrimaryGeneratorAction(detConstruction);   
+
+  //auto actionInitialization = new mpdActionInitialization(detConstruction,genAction);
   auto actionInitialization = new mpdActionInitialization(detConstruction);
   runManager->SetUserInitialization(actionInitialization);
   

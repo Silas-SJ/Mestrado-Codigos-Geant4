@@ -96,13 +96,23 @@ mpdRunAction::mpdRunAction()
   analysisManager->CreateNtupleDColumn("gapPionPassed");  // 25
   analysisManager->CreateNtupleDColumn("scintPionCapture"); //26
   analysisManager->CreateNtupleDColumn("detabsPionCapture"); // 27
+  analysisManager->CreateNtupleDColumn("gap2Piondecay"); // 28
   analysisManager->FinishNtuple();
+  
+  // Open an output file
+  //
+  G4String fileName = "mpd";
+  analysisManager->OpenFile(fileName);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 mpdRunAction::~mpdRunAction()
 {
+  // For run end keep information
+  auto analysisManager = G4AnalysisManager::Instance();
+  analysisManager->Write();
+  analysisManager->CloseFile();
   delete G4AnalysisManager::Instance();  
 }
 
@@ -110,6 +120,7 @@ mpdRunAction::~mpdRunAction()
 
 void mpdRunAction::BeginOfRunAction(const G4Run* /*run*/)
 { 
+/*
   //inform the runManager to save random number seed
   //G4RunManager::GetRunManager()->SetRandomNumberStore(true);
   
@@ -120,6 +131,7 @@ void mpdRunAction::BeginOfRunAction(const G4Run* /*run*/)
   //
   G4String fileName = "mpd";
   analysisManager->OpenFile(fileName);
+  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -160,9 +172,11 @@ void mpdRunAction::EndOfRunAction(const G4Run* /*run*/)
   }
 
   // save histograms & ntuple
-  //
+  // For run and don't keep information
+ /* 
   analysisManager->Write();
   analysisManager->CloseFile();
+  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

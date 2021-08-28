@@ -60,10 +60,42 @@ private:
  
   mpdPrimaryGeneratorAction* genaction; 
   // data members                   
-  G4int  fAbsHCID;
-  G4int  fGapHCID;
+  G4int  fAbs3HCID;
+  G4int  fAbs4HCID;
+  G4int  fAbs5HCID;
+  G4int  fAbs6HCID;
+  G4int  fAbs7HCID;
+  G4int  fAbs8HCID;
+  G4int  fAbs9HCID;
+  G4int  fAbs10HCID;
+  G4int  fAbs11HCID;
+  G4int  fAbs12HCID;
+
+  G4int  fGap3HCID;
+  G4int  fGap4HCID; 
+  G4int  fGap5HCID; 
+  G4int  fGap6HCID; 
+  G4int  fGap7HCID; 
+  G4int  fGap8HCID; 
+  G4int  fGap9HCID; 
+  G4int  fGap10HCID; 
+  G4int  fGap11HCID; 
+  G4int  fGap12HCID; 
+  
+  G4int flayer3HCID;
+  G4int flayer4HCID;
+  G4int flayer5HCID;
+  G4int flayer6HCID;
+  G4int flayer7HCID;
+  G4int flayer8HCID;
+  G4int flayer9HCID;
+  G4int flayer10HCID;
+  G4int flayer11HCID;
+  G4int flayer12HCID;
+  
   G4int  fScintHCID;
   G4int fDetabsHCID;
+
 };
                      
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
