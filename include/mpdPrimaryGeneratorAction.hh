@@ -69,6 +69,8 @@ private:
   G4ParticleGun*  fParticleGun; // G4 particle gunß
     mpdDetectorConstruction* DetConst;
     G4double thetabin[200];
+    G4double energybin[20];
+    G4double fluxbin[20];
     G4double gunenergy;
     G4double pX;
     G4double pY;
@@ -78,7 +80,6 @@ private:
     G4double Z;
     G4double Theta;
     G4double Phi;
-   
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

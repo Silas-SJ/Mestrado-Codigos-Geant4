@@ -1,4 +1,4 @@
-// ROOT macro file for plotting MPD ntuple
+:q// ROOT macro file for plotting MPD ntuple
 // 
 // Can be run from ROOT session:
 // root[0] .x plotNtuple.C

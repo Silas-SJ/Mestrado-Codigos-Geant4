@@ -139,7 +139,7 @@ G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
   auto worldSizeY = 1.2 * calorSizeY;
   auto worldSizeZ  = 1.2 * calorThickness;
 
-//Scintillator + waveguide
+//detector "raquete" (paralelepípedo+trapézio)
   G4double scinti_x = 40.*cm/2.;
   G4double scinti_y = 40.*cm/2.;
   G4double scinti_z = 2.5*cm/2.;
@@ -149,14 +149,14 @@ G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
   G4double pDx1 = 2.5*cm/2.;
   G4double pDx2 = 2.5*cm/2.;
   G4double pPhi = 90.*deg;
-//Photomultiplier + photocathode
-  G4double PMT_pRMin = 0*cm;
-  G4double PMT_pRMax = 2.6*cm;
-  G4double vidro_Dz = 3.*mm/2.;
-  G4double PMT_SPhi = 0.*deg;
-  G4double PMT_DPhi = 360.*deg;
+//fotomultiplicadora+fotocátodo do detector "raquete"
+  G4double Photo2_pRMin = 0*cm;
+  G4double Photo2_pRMax = 2.6*cm;
+  G4double vidro2_Dz = 3.*mm/2.;
+  G4double Photo2_SPhi = 0.*deg;
+  G4double Photo2_DPhi = 360.*deg;
   G4double lamina2_Dz = 1.*mm/2.;
-//ghost volume for the detector (scintillator + waveguide +PMT)
+//volume fantasma (para alocar todos os componentes do detector "raquete")
   G4double caixa_x = 72.*cm/2;
   G4double caixa_y = 40.1*cm/2;
   G4double caixa_z = 5.2*cm/2;
@@ -387,7 +387,7 @@ G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
                    "Gap2",            // its name
                    layerLV2,          // its mother  volume
                    false,            // no boolean operation
-                   1,                // copy number. "detabsorber"
+                   1,                // copy number
                    fCheckOverlaps);  // checking overlaps
     //
     // Scintillator
@@ -436,8 +436,8 @@ G4VPhysicalVolume* mpdDetectorConstruction::DefineVolumes()
   G4double detposX = 5*m-calorSizeX/2;
   G4double detposY = 2*m-calorSizeY/2;
   G4VPhysicalVolume* caixa_phys[12];
-  caixa_phys[0] = new G4PVPlacement(0,G4ThreeVector(detposX+pDz+vidro_Dz, detposY,scinti_z+gapThickness/2-68*cm),caixa_log,"caixa",gapLV2,false,1); // copy 1 - bottom detector
-  caixa_phys[1] = new G4PVPlacement(0,G4ThreeVector(detposX+pDz+vidro_Dz, detposY,scinti_z+gapThickness/2-detabsThickness/2-77*cm),caixa_log,"caixa",gapLV2,false,0); // copy 0 - top detector
+  caixa_phys[0] = new G4PVPlacement(0,G4ThreeVector(detposX+pDz+vidro2_Dz, detposY,scinti_z+gapThickness/2-68*cm),caixa_log,"caixa",gapLV2,false,0); // copy 0
+  caixa_phys[1] = new G4PVPlacement(0,G4ThreeVector(detposX+pDz+vidro2_Dz, detposY,scinti_z+gapThickness/2-detabsThickness/2-77*cm),caixa_log,"caixa",gapLV2,false,1); // copy 1
     
 //Cintilador (paralelepípedo do detector)
 
@@ -458,24 +458,24 @@ G4LogicalVolume* trapezio_log = new G4LogicalVolume(trapezio_Trap,Glass,"trapezi
 
 G4VPhysicalVolume* trapezio_phys = new G4PVPlacement(G4Transform3D(rm,G4ThreeVector(35*cm-15.9*cm,0,0)),trapezio_log,"Trapezio",caixa_log,false,0);
 
-//Vidro 2 (fotomultiplicadora)
+//Vidro 2 (fotomultiplicadora da "raquete")
 
 G4RotationMatrix rm2;
 rm2.rotateY(pPhi);
 
-G4Tubs* vidro_Tubs = new G4Tubs("Foto_raquete",PMT_pRMin,PMT_pRMax,vidro_Dz,PMT_SPhi,PMT_DPhi);
+G4Tubs* vidro2_Tubs = new G4Tubs("Foto_raquete",Photo2_pRMin,Photo2_pRMax,vidro2_Dz,Photo2_SPhi,Photo2_DPhi);
 
-G4LogicalVolume* vidro_log = new G4LogicalVolume(vidro_Tubs,Glass,"vidro",0,0,0);
+G4LogicalVolume* vidro2_log = new G4LogicalVolume(vidro2_Tubs,Glass,"vidro2",0,0,0);
 
-G4VPhysicalVolume* vidro_phys = new G4PVPlacement(G4Transform3D(rm2,G4ThreeVector(50*cm+vidro_Dz-15.9*cm,0,0)),vidro_log,"Vidro",caixa_log,false,0);
+G4VPhysicalVolume* vidro2_phys = new G4PVPlacement(G4Transform3D(rm2,G4ThreeVector(50*cm+vidro2_Dz-15.9*cm,0,0)),vidro2_log,"Vidro2",caixa_log,false,0);
     
-//Photocatodo (fotocátodo da fotomultiplicadora, cujo volume vai "dentro" do vidro)
+//Photocatodo 2 (fotocátodo da fotomultiplicadora da "raquete", cujo volume vai "dentro" da fotomultiplicadora)
 
-G4Tubs* photocathode = new G4Tubs("photocathode_tube",PMT_pRMin,PMT_pRMax,lamina2_Dz,PMT_SPhi,PMT_DPhi);
+G4Tubs* photocath2 = new G4Tubs("photocath2_tube",Photo2_pRMin,Photo2_pRMax,lamina2_Dz,Photo2_SPhi,Photo2_DPhi);
 
-G4LogicalVolume* photocathode_log = new G4LogicalVolume(photocathode,Al,"photocathode_log",0,0,0);
+G4LogicalVolume* photocath2_log = new G4LogicalVolume(photocath2,Al,"photocath2_log",0,0,0);
 
-G4VPhysicalVolume* photocathode_phys = new G4PVPlacement(0,G4ThreeVector(0,0,0),photocathode_log,"photocathode",vidro_log,false,0);
+G4VPhysicalVolume* photocath2_phys = new G4PVPlacement(0,G4ThreeVector(0,0,0),photocath2_log,"photocath2",vidro2_log,false,0);
 
     
        //
@@ -525,20 +525,20 @@ G4VPhysicalVolume* photocathode_phys = new G4PVPlacement(0,G4ThreeVector(0,0,0),
 
     //Interface Vidro(fotomultiplicadora)-Photocatodo
 
-      G4OpticalSurface* photocathode_opsurf= new G4OpticalSurface("photocathode_opsurf",glisur,polished,dielectric_metal);
-      G4LogicalSkinSurface* Int_vidro_photocathode = new G4LogicalSkinSurface("photocathode_surf",photocathode_log,photocathode_opsurf);
+      G4OpticalSurface* photocath2_opsurf= new G4OpticalSurface("photocath2_opsurf",glisur,polished,dielectric_metal);
+      G4LogicalSkinSurface* Int_vidro2_photocath2 = new G4LogicalSkinSurface("photocath2_surf",photocath2_log,photocath2_opsurf);
 
     //Interface Vidro(fotomultiplicadora)-Ar
 
-      G4OpticalSurface* Op_Vidro_Ar = new G4OpticalSurface("Vidro_Ar");
-      Op_Vidro_Ar -> SetType(dielectric_metal);
-      Op_Vidro_Ar -> SetFinish(polished);
-      Op_Vidro_Ar -> SetModel(unified);
+      G4OpticalSurface* Op_Vidro2_Ar = new G4OpticalSurface("Vidro2_Ar");
+      Op_Vidro2_Ar -> SetType(dielectric_metal);
+      Op_Vidro2_Ar -> SetFinish(polished);
+      Op_Vidro2_Ar -> SetModel(unified);
 
      for (int i=0; i<2;i++) {
         G4LogicalBorderSurface* Int_Scinti_Ar = new G4LogicalBorderSurface("Scinti_Ar",Scinti_phys,caixa_phys[i],Op_Scinti_Ar);
         G4LogicalBorderSurface* Int_Glass_Ar = new G4LogicalBorderSurface("Glass_Ar",trapezio_phys,caixa_phys[i],Op_Glass_Ar);
-        G4LogicalBorderSurface* Int_Vidro_Ar = new G4LogicalBorderSurface("Vidro_Ar",photocathode_phys,caixa_phys[i],Op_Vidro_Ar);
+        G4LogicalBorderSurface* Int_Vidro2_Ar = new G4LogicalBorderSurface("Vidro2_Ar",photocath2_phys,caixa_phys[i],Op_Vidro2_Ar);
      }
 
 //================================== Propriedades opticas das interfaces ===================================
@@ -563,15 +563,15 @@ G4VPhysicalVolume* photocathode_phys = new G4PVPlacement(0,G4ThreeVector(0,0,0),
       Op_Glass_Ar -> SetMaterialPropertiesTable(scinti_ar);
 
 
-      G4MaterialPropertiesTable* photocathode_mt = new G4MaterialPropertiesTable();
-      photocathode_mt -> AddProperty("EFFICIENCY", Ephoton, Efficiency2, num);
-      photocathode_mt -> AddProperty("REFLECTIVITY", Ephoton, Reflectivity2, num);
-      photocathode_opsurf -> SetMaterialPropertiesTable(photocathode_mt);
+      G4MaterialPropertiesTable* photocath2_mt = new G4MaterialPropertiesTable();
+      photocath2_mt -> AddProperty("EFFICIENCY", Ephoton, Efficiency2, num);
+      photocath2_mt -> AddProperty("REFLECTIVITY", Ephoton, Reflectivity2, num);
+      photocath2_opsurf -> SetMaterialPropertiesTable(photocath2_mt);
 
-      G4MaterialPropertiesTable* vidro_ar = new G4MaterialPropertiesTable();
-      vidro_ar -> AddProperty("REFLECTIVITY", Ephoton, Reflectivity2, num);
-      vidro_ar -> AddProperty("REFRACTIVE", Ephoton, Refractive2, num);
-      Op_Vidro_Ar -> SetMaterialPropertiesTable(vidro_ar);
+      G4MaterialPropertiesTable* vidro2_ar = new G4MaterialPropertiesTable();
+      vidro2_ar -> AddProperty("REFLECTIVITY", Ephoton, Reflectivity2, num);
+      vidro2_ar -> AddProperty("REFRACTIVE", Ephoton, Refractive2, num);
+      Op_Vidro2_Ar -> SetMaterialPropertiesTable(vidro2_ar);
       
 /*
 // ---------- Surface -----------
@@ -669,19 +669,19 @@ void mpdDetectorConstruction::ConstructSDandField()
   SetSensitiveDetector("GapLV",gapSD);
 
   auto scintSD
-    = new mpdCalorimeterSD("ScintSD", "ScintHitsCollection", 2); // 2 scintillator
+    = new mpdCalorimeterSD("ScintSD", "ScintHitsCollection", fNofLayers);
   G4SDManager::GetSDMpointer()->AddNewDetector(scintSD);
   SetSensitiveDetector("Scinti_log",scintSD);
 
   auto detabsSD
-    = new mpdCalorimeterSD("DetabsSD", "DetabsHitsCollection", 1); // 1 detector absorber
+    = new mpdCalorimeterSD("DetabsSD", "DetabsHitsCollection", fNofLayers);
   G4SDManager::GetSDMpointer()->AddNewDetector(detabsSD);
   SetSensitiveDetector("DetabsLV",detabsSD);
     
   auto pmtSD
     = new mpdPMTSD("mpdPMTSD");
     G4SDManager::GetSDMpointer()->AddNewDetector( pmtSD );
-    SetSensitiveDetector( "vidro",pmtSD );
+    SetSensitiveDetector( "vidro2",pmtSD );
     
   // 
   // Magnetic field

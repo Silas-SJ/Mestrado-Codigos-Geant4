@@ -34,7 +34,6 @@
 
 #include "mpdCalorHit.hh"
 
-
 #include <vector>
 
 class G4Step;
@@ -47,11 +46,11 @@ class G4HCofThisEvent;
 ///
 /// The values are accounted in hits in ProcessHits() function which is called
 /// by Geant4 kernel at each step.
+
 class mpdCalorimeterSD : public G4VSensitiveDetector
 {
   public:
-    mpdCalorimeterSD(
-                     const G4String& name,
+    mpdCalorimeterSD(const G4String& name,
                      const G4String& hitsCollectionName, 
                      G4int nofCells);
     virtual ~mpdCalorimeterSD();
@@ -60,16 +59,10 @@ class mpdCalorimeterSD : public G4VSensitiveDetector
     virtual void   Initialize(G4HCofThisEvent* hitCollection);
     virtual G4bool ProcessHits(G4Step* step, G4TouchableHistory* history);
     virtual void   EndOfEvent(G4HCofThisEvent* hitCollection);
-    
-   public: 
-   G4int oldID;
-   G4int eventID;
-   
+
   private:
     mpdCalorHitsCollection* fHitsCollection;
     G4int  fNofCells;
-    
-    
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

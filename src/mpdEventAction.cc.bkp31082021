@@ -143,51 +143,43 @@ void mpdEventAction::EndOfEventAction(const G4Event* event)
     fPmtHSCID
       = G4SDManager::GetSDMpointer()->GetCollectionID("pmtSignalHitCollection");
   }
-  /*
     G4cout << "fAbsHCID: " << fAbsHCID << G4endl;
     G4cout << "fGapHCID: " << fGapHCID << G4endl;
     G4cout << "fScintHCID: " << fScintHCID << G4endl;
     G4cout << "fDetabsHCID: " << fDetabsHCID << G4endl;
     G4cout << "fPmtHCID: " << fPmtHCID << G4endl;
     G4cout << "fPmtHSCID: " << fPmtHSCID << G4endl;
-*/
+
     G4DigiManager * fDM = G4DigiManager::GetDMpointer();
     
   // Get hits collections
-  auto absHC = GetHitsCollection(fAbsHCID, event);
+  auto absoHC = GetHitsCollection(fAbsHCID, event);
   auto gapHC = GetHitsCollection(fGapHCID, event);
   auto scintHC = GetHitsCollection(fScintHCID, event);
   auto detabsHC = GetHitsCollection(fDetabsHCID, event);
 //  auto pmtHC = GetHitsCollection(fPmtHCID, event);
 //  auto pmtSHC = GetHitsCollection(fPmtHSCID, event);
   // Get hit with total values
-//  auto absoHit = (*absoHC)[absoHC->entries()-1];
-//  auto gapHit = (*gapHC)[gapHC->entries()-1];
+  auto absoHit = (*absoHC)[absoHC->entries()-1];
+  auto gapHit = (*gapHC)[gapHC->entries()-1];
   //auto scintHit = (*scintHC)[absoHC->entries()-1];
   //auto detabsHit = (*detabsHC)[gapHC->entries()-1];
   // Print per event (modulo n)
   //
-  std::map<G4int,G4int> ScintPionDecay;
-  std::map<G4int,G4int> ScintMuonDecay;
+  G4int nMuon=0;
+  G4int nPion=0;
   std::map<G4int,std::set<G4int>> ScintPionPassed;
   std::map<G4int,std::set<G4int>> ScintMuonPassed;
   std::set<G4int> ScintPionID;
   std::set<G4int> ScintMuonID;
-  std::map<G4int,G4int> DetabsPionDecay;
-  std::map<G4int,G4int> DetabsMuonDecay;
-  std::map<G4int,std::set<G4int>> DetabsPionPassed;
-  std::map<G4int,std::set<G4int>> DetabsMuonPassed;
-  std::set<G4int> DetabsPionID;
-  std::set<G4int> DetabsMuonID;
   auto eventID = event->GetEventID();
-
-  for (uint i=0;i<(scintHC->entries());i++){
-   auto scintHitlayer = (*scintHC)[i];     
-/*	   G4cout << "Pion TrackID: " << scintHitlayer->GetPionTrackID() << "  DetNo: " << scintHitlayer->GetLayerID() << "  Edep: " << scintHitlayer->GetEdep() << "  TrackLength: " << scintHitlayer->GetTrackLength() << G4endl;
+  G4cout << "passa 1" << G4endl;
+  for (uint i=0;i<(scintHC->entries()-1);i++){ // menos 1 devido à reserva para a o total.
+   auto scintHitlayer = (*scintHC)[i];         // Exige mudança radical do código
+	   G4cout << "Pion TrackID: " << scintHitlayer->GetPionTrackID() << "  DetNo: " << scintHitlayer->GetLayerID() << "  Edep: " << scintHitlayer->GetEdep() << "  TrackLength: " << scintHitlayer->GetTrackLength() << G4endl;
 	   G4cout << "Muon TrackID: " << scintHitlayer->GetMuonTrackID() << "  DetNo: " << scintHitlayer->GetLayerID() << "  Edep: " << scintHitlayer->GetEdep() << "  TrackLength: " << scintHitlayer->GetTrackLength() << G4endl;
 	   G4cout << "Pion Decay: " << scintHitlayer->GetPionDecay() << "  DetNo: " << scintHitlayer->GetLayerID() << "  Edep: " << scintHitlayer->GetEdep() << "  TrackLength: " << scintHitlayer->GetTrackLength() << G4endl;
 	   G4cout << "Muon Decay: " << scintHitlayer->GetMuonDecay() << "  DetNo: " << scintHitlayer->GetLayerID() << "  Edep: " << scintHitlayer->GetEdep() << "  TrackLength: " << scintHitlayer->GetTrackLength() << G4endl;
-*/
    if(scintHitlayer->GetPionTrackID()!=-111) {
     ScintPionID.insert(scintHitlayer->GetPionTrackID());
     ScintPionPassed[scintHitlayer->GetLayerID()]=ScintPionID;        
@@ -196,128 +188,21 @@ void mpdEventAction::EndOfEventAction(const G4Event* event)
     ScintMuonID.insert(scintHitlayer->GetMuonTrackID());
     ScintMuonPassed[scintHitlayer->GetLayerID()]=ScintMuonID;        
    }
-   ScintPionDecay[scintHitlayer->GetLayerID()]+=scintHitlayer->GetPionDecay();
-   ScintMuonDecay[scintHitlayer->GetLayerID()]+=scintHitlayer->GetMuonDecay();
   }
-
-  for (uint i=0;i<(detabsHC->entries());i++){
-   auto detabsHitlayer = (*detabsHC)[i];     
-   if(detabsHitlayer->GetPionTrackID()!=-111) {
-    DetabsPionID.insert(detabsHitlayer->GetPionTrackID());
-    DetabsPionPassed[detabsHitlayer->GetLayerID()]=ScintPionID;        
-   }
-   if(detabsHitlayer->GetMuonTrackID()!=-111) {
-    DetabsMuonID.insert(detabsHitlayer->GetMuonTrackID());
-    DetabsMuonPassed[detabsHitlayer->GetLayerID()]=DetabsMuonID;        
-   }
-   DetabsPionDecay[detabsHitlayer->GetLayerID()]+=detabsHitlayer->GetPionDecay();
-   DetabsMuonDecay[detabsHitlayer->GetLayerID()]+=detabsHitlayer->GetMuonDecay();
-  }
-/* Desliguei também
+  G4cout << "passa 2" << G4endl;
   for(auto i=ScintPionPassed.begin();i!=ScintPionPassed.end();++i){
    G4cout << "Number of pions: " << i->second.size() << " on detector: " << i->first << G4endl;    
   }
   for(auto i=ScintMuonPassed.begin();i!=ScintMuonPassed.end();++i){
    G4cout << "Number of muons: " << i->second.size() << " on detector: " << i->first << G4endl;    
   }
-  for(auto i=ScintPionDecay.begin();i!=ScintPionDecay.end();++i){
-   G4cout << "Number of pion decay: " << i->second << " on detector: " << i->first << G4endl;    
-  }
-  for(auto i=ScintMuonDecay.begin();i!=ScintMuonDecay.end();++i){
-   G4cout << "Number of muon decay: " << i->second << " on detector: " << i->first << G4endl;    
-  }
-  
-  for(auto i=DetabsPionPassed.begin();i!=DetabsPionPassed.end();++i){
-   G4cout << "Number of pions: " << i->second.size() << " on detabsorber: " << i->first << G4endl;    
-  }
-  for(auto i=DetabsMuonPassed.begin();i!=DetabsMuonPassed.end();++i){
-   G4cout << "Number of muons: " << i->second.size() << " on detabsorber: " << i->first << G4endl;    
-  }
-  for(auto i=DetabsPionDecay.begin();i!=DetabsPionDecay.end();++i){
-   G4cout << "Number of pion decay: " << i->second << " on detabsorber: " << i->first << G4endl;    
-  }
-  for(auto i=DetabsMuonDecay.begin();i!=DetabsMuonDecay.end();++i){
-   G4cout << "Number of muon decay: " << i->second << " on detabsorber: " << i->first << G4endl;    
-  }
-*/
-  std::map<G4int,G4int> GapPionDecay;
-  std::map<G4int,G4int> GapMuonDecay;
-  std::map<G4int,std::set<G4int>> GapPionPassed;
-  std::map<G4int,std::set<G4int>> GapMuonPassed;
-  std::set<G4int> GapPionID;
-  std::set<G4int> GapMuonID;
-  std::map<G4int,G4int> AbsPionDecay;
-  std::map<G4int,G4int> AbsMuonDecay;
-  std::map<G4int,std::set<G4int>> AbsPionPassed;
-  std::map<G4int,std::set<G4int>> AbsMuonPassed;
-  std::set<G4int> AbsPionID;
-  std::set<G4int> AbsMuonID;
-
-  for (uint i=0;i<(gapHC->entries());i++){
-   auto gapHitlayer = (*gapHC)[i];
-/*         G4cout << "Pion TrackID: " << gapHitlayer->GetPionTrackID() << "  DetNo: " << gapHitlayer->GetLayerID() << "  Edep: " << gapHitlayer->GetEdep() << "  TrackLength: " << gapHitlayer->GetTrackLength() << G4endl;
-           G4cout << "Muon TrackID: " << gapHitlayer->GetMuonTrackID() << "  DetNo: " << gapHitlayer->GetLayerID() << "  Edep: " << gapHitlayer->GetEdep() << "  TrackLength: " << gapHitlayer->GetTrackLength() << G4endl;
-           G4cout << "Pion Decay: " << gapHitlayer->GetPionDecay() << "  DetNo: " << gapHitlayer->GetLayerID() << "  Edep: " << gapHitlayer->GetEdep() << "  TrackLength: " << gapHitlayer->GetTrackLength() << G4endl;
-           G4cout << "Muon Decay: " << gapHitlayer->GetMuonDecay() << "  DetNo: " << gapHitlayer->GetLayerID() << "  Edep: " << gapHitlayer->GetEdep() << "  TrackLength: " << gapHitlayer->GetTrackLength() << G4endl;
-*/
-   if(gapHitlayer->GetPionTrackID()!=-111) {
-    GapPionID.insert(gapHitlayer->GetPionTrackID());
-    GapPionPassed[gapHitlayer->GetLayerID()]=GapPionID;
-   }
-   if(gapHitlayer->GetMuonTrackID()!=-111) {
-    GapMuonID.insert(gapHitlayer->GetMuonTrackID());
-    GapMuonPassed[gapHitlayer->GetLayerID()]=GapMuonID;
-   }
-   GapPionDecay[gapHitlayer->GetLayerID()]+=gapHitlayer->GetPionDecay();
-   GapMuonDecay[gapHitlayer->GetLayerID()]+=gapHitlayer->GetMuonDecay();
-  }
-
-  for (uint i=0;i<(absHC->entries());i++){
-   auto absHitlayer = (*absHC)[i];
-   if(absHitlayer->GetPionTrackID()!=-111) {
-    AbsPionID.insert(absHitlayer->GetPionTrackID());
-    AbsPionPassed[absHitlayer->GetLayerID()]=GapPionID;
-   }
-   if(absHitlayer->GetMuonTrackID()!=-111) {
-    AbsMuonID.insert(absHitlayer->GetMuonTrackID());
-    AbsMuonPassed[absHitlayer->GetLayerID()]=AbsMuonID;
-   }
-   AbsPionDecay[absHitlayer->GetLayerID()]+=absHitlayer->GetPionDecay();
-   AbsMuonDecay[absHitlayer->GetLayerID()]+=absHitlayer->GetMuonDecay();
-  }
-/* Desliguei também
-  for(auto i=GapPionPassed.begin();i!=GapPionPassed.end();++i){
-  G4cout << "Number of pions: " << i->second.size() << " on gap: " << i->first << G4endl;
-  }
-  for(auto i=GapMuonPassed.begin();i!=GapMuonPassed.end();++i){
-   G4cout << "Number of muons: " << i->second.size() << " on gap: " << i->first << G4endl;
-  }
-  for(auto i=GapPionDecay.begin();i!=GapPionDecay.end();++i){
-   G4cout << "Number of pion decay: " << i->second << " on gap: " << i->first << G4endl;
-  }
-  for(auto i=GapMuonDecay.begin();i!=GapMuonDecay.end();++i){
-  G4cout << "Number of muon decay: " << i->second << " on gap: " << i->first << G4endl;
-  }
-  for(auto i=AbsPionPassed.begin();i!=AbsPionPassed.end();++i){
-   G4cout << "Number of pions: " << i->second.size() << " on absorber: " << i->first << G4endl;   
-  }
-  for(auto i=AbsMuonPassed.begin();i!=AbsMuonPassed.end();++i){
-   G4cout << "Number of muons: " << i->second.size() << " on absorber: " << i->first << G4endl;  
-  }
-  for(auto i=AbsPionDecay.begin();i!=AbsPionDecay.end();++i){
-  G4cout << "Number of pion decay: " << i->second << " on absorber: " << i->first << G4endl;
-  }
-  for(auto i=AbsMuonDecay.begin();i!=AbsMuonDecay.end();++i){
-   G4cout << "Number of muon decay: " << i->second << " on absorber: " << i->first << G4endl;
-  }
-*/
   auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
   if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {
     G4cout << "---> End of event: " << eventID << G4endl;     
 
-//    PrintEventStatistics(
-//      absoHit->GetEdep(), absoHit->GetTrackLength(),
-//      gapHit->GetEdep(), gapHit->GetTrackLength());
+    PrintEventStatistics(
+      absoHit->GetEdep(), absoHit->GetTrackLength(),
+      gapHit->GetEdep(), gapHit->GetTrackLength());
   }  
 
  // Digitization
@@ -333,10 +218,10 @@ void mpdEventAction::EndOfEventAction(const G4Event* event)
  mpdDM->Digitize();
 
  G4int DCID = fDM->GetDigiCollectionID("mpdDigitsCollection");
-//    G4cout << "DCID: " << DCID << G4endl;
+    G4cout << "DCID: " << DCID << G4endl;
  mpdDigitsCollection * DC =
  (mpdDigitsCollection*)fDM->GetDigiCollection(DCID);
-//    G4cout << "DC->entries() " << DC->entries() << G4endl;
+    G4cout << "DC->entries() " << DC->entries() << G4endl;
 /*
  if(DC) {
   G4int n_digi =  DC->entries();

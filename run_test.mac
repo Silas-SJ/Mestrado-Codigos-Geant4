@@ -1,0 +1,5 @@
+/run/initialize
+/gun/particle pi+
+/run/beamOn 10
+
+

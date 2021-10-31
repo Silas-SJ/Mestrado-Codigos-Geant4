@@ -30,6 +30,7 @@
 #include "mpdDetectorConstruction.hh"
 #include "mpdPrimaryGeneratorAction.hh"
 #include "mpdActionInitialization.hh"
+#include "mpdTreeManager.hh"
 
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
@@ -39,10 +40,12 @@
 
 #include "G4GenericPhysicsList.hh"
 #include "G4VModularPhysicsList.hh"
+#include "FTFP_BERT.hh"
+#include "G4OpticalPhysics.hh"
+#include "G4EmStandardPhysics_option4.hh"
 
 #include "G4UImanager.hh"
 #include "G4UIcommand.hh"
-#include "FTFP_BERT.hh"
 
 #include "Randomize.hh"
 
@@ -102,6 +105,11 @@ int main(int argc,char** argv)
   // Optionally: choose a different Random engine...
   //
   // G4Random::setTheEngine(new CLHEP::MTwistEngine);
+
+ // Sort seed from current time
+  G4Random::setTheEngine(new CLHEP::RanecuEngine());
+  G4long seed = time(NULL);
+  G4Random::setTheSeed(seed);
   
   // Construct the default run manager
   //
@@ -116,13 +124,12 @@ int main(int argc,char** argv)
 
   // Set mandatory initialization classes
   //
-  auto detConstruction = new mpdDetectorConstruction();           //
-  runManager->SetUserInitialization(detConstruction);             //
-
-//  auto genAction = new mpdPrimaryGeneratorAction(detConstruction);
+  auto detConstruction = new mpdDetectorConstruction();
+  runManager->SetUserInitialization(detConstruction);
 
 //  auto physicsList = new FTFP_BERT;
 //  runManager->SetUserInitialization(physicsList);
+  
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
@@ -138,25 +145,24 @@ int main(int argc,char** argv)
       // from vector of physics cobstructor names
       std::vector<G4String>* myConstructors = new std::vector<G4String>;
 
-      myConstructors->push_back("G4EmStandardPhysics");
-      myConstructors->push_back("G4EmExtraPhysics");
+      myConstructors->push_back("G4EmStandardPhysics_option4");
+  //    myConstructors->push_back("G4EmExtraPhysics");
       myConstructors->push_back("G4DecayPhysics");
-      myConstructors->push_back("G4HadronElasticPhysics");
+ //     myConstructors->push_back("G4HadronElasticPhysics");
       myConstructors->push_back("G4HadronPhysicsFTFP_BERT");
-      myConstructors->push_back("G4StoppingPhysics");
-      myConstructors->push_back("G4IonPhysics");
-      myConstructors->push_back("G4NeutronTrackingCut");
+ //     myConstructors->push_back("G4StoppingPhysics");
+ //     myConstructors->push_back("G4IonPhysics");
+ //     myConstructors->push_back("G4NeutronTrackingCut");
+      myConstructors->push_back("G4OpticalPhysics");
 
       physList = new G4GenericPhysicsList(myConstructors);
     }
   runManager->SetUserInitialization(physList);
-  
-              //
  
-  //auto genAction = new mpdPrimaryGeneratorAction(detConstruction);   
-
-  //auto actionInitialization = new mpdActionInitialization(detConstruction,genAction);
-  auto actionInitialization = new mpdActionInitialization(detConstruction);
+  auto genAction = new mpdPrimaryGeneratorAction(detConstruction);
+  auto  histo = new mpdTreeManager();
+    
+  auto actionInitialization = new mpdActionInitialization(detConstruction,genAction,histo);
   runManager->SetUserInitialization(actionInitialization);
   
   // Initialize visualization
@@ -177,7 +183,7 @@ int main(int argc,char** argv)
   }
   else  {  
     // interactive mode : define UI session
-   UImanager->ApplyCommand("/control/execute init_vis.mac");
+    UImanager->ApplyCommand("/control/execute init_vis.mac");
     if (ui->IsGUI()) {
       UImanager->ApplyCommand("/control/execute gui.mac");
     }
