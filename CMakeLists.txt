@@ -18,6 +18,28 @@ else()
 endif()
 
 #----------------------------------------------------------------------------
+# Find ROOT (required package)
+#
+find_package(ROOT REQUIRED)
+
+# ROOT version 6 required
+if(ROOT_FOUND)
+  message("ROOT found")
+  EXECUTE_PROCESS(COMMAND root-config --cflags OUTPUT_VARIABLE ROOT_CXX_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
+  STRING(REGEX MATCH "6.*" VERSION6MATCH ${ROOT_VERSION})
+  if(NOT VERSION6MATCH)
+    message(FATAL_ERROR "mpd requires ROOT 6")
+  endif()
+  else()
+  message(FATAL_ERROR "mpd requires ROOT")
+endif()
+
+# Include ROOT's CMake functions for dictionary generation
+#include("${ROOT_DIR}/modules/RootNewMacros.cmake") 
+include("${ROOT_DIR}/RootMacros.cmake") 
+
+#----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
 #
@@ -35,7 +57,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(mpd mpd.cc ${sources} ${headers})
-target_link_libraries(mpd ${Geant4_LIBRARIES})
+target_link_libraries(mpd ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we

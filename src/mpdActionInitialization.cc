@@ -28,6 +28,7 @@
 /// \brief Implementation of the mpdActionInitialization class
 
 #include "mpdActionInitialization.hh"
+#include "mpdTreeManager.hh"
 #include "mpdPrimaryGeneratorAction.hh"
 #include "mpdDetectorConstruction.hh"
 #include "mpdRunAction.hh"
@@ -35,10 +36,9 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mpdActionInitialization::mpdActionInitialization(mpdDetectorConstruction* da)
-//mpdActionInitialization::mpdActionInitialization(mpdPrimaryGeneratorAction* ga)
-: G4VUserActionInitialization(), DetConst(da)
-//: PrimGen(ga)
+mpdActionInitialization::mpdActionInitialization(mpdDetectorConstruction* da, mpdPrimaryGeneratorAction* ga, mpdTreeManager* tree)
+// : G4VUserActionInitialization()
+: DetConst(da),PrimGen(ga),mpdTree(tree)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -50,19 +50,17 @@ mpdActionInitialization::~mpdActionInitialization()
 
 void mpdActionInitialization::BuildForMaster() const
 {
-  SetUserAction(new mpdRunAction);
+  SetUserAction(new mpdRunAction(mpdTree));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void mpdActionInitialization::Build() const
 {
-//  SetUserAction(new mpdPrimaryGeneratorAction(DetConst));
- // SetUserAction(PrimGen);
-  auto PrimGen = new mpdPrimaryGeneratorAction(DetConst);
+  SetUserAction(new mpdPrimaryGeneratorAction(DetConst));
   SetUserAction(PrimGen);
-  SetUserAction(new mpdRunAction);
-  SetUserAction(new mpdEventAction(PrimGen));
+  SetUserAction(new mpdRunAction(mpdTree));
+  SetUserAction(new mpdEventAction(PrimGen,mpdTree));
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

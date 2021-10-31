@@ -29,6 +29,7 @@
 
 #include "mpdRunAction.hh"
 #include "mpdAnalysis.hh"
+#include "mpdTreeManager.hh"
 
 #include "G4Run.hh"
 #include "G4RunManager.hh"
@@ -37,12 +38,12 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mpdRunAction::mpdRunAction()
- : G4UserRunAction()
+mpdRunAction::mpdRunAction(mpdTreeManager* tree)
+ : G4UserRunAction(),fTreeManager(tree)
 { 
   // set printing event number per each event
   G4RunManager::GetRunManager()->SetPrintProgress(1);     
-
+/*
   // Create analysis manager
   // The choice of analysis technology is done via selectin of a namespace
   // in mpdAnalysis.hh
@@ -68,35 +69,19 @@ mpdRunAction::mpdRunAction()
   // Creating ntuple
   //
   analysisManager->CreateNtuple("mpd", "Edep and TrackL");
-  analysisManager->CreateNtupleDColumn("Eabs"); // 0
-  analysisManager->CreateNtupleDColumn("Egap"); // 1
-  analysisManager->CreateNtupleDColumn("Labs"); // 2
-  analysisManager->CreateNtupleDColumn("Lgap"); // 3
-  analysisManager->CreateNtupleIColumn("scintPiondecay");  // 4
-  analysisManager->CreateNtupleIColumn("scintPionEnergy"); // 5
-  analysisManager->CreateNtupleIColumn("detabsPiondecay"); // 6
-  analysisManager->CreateNtupleIColumn("detabsPionEnergy"); // 7
-  analysisManager->CreateNtupleIColumn("scintMuondecay");  // 8
-  analysisManager->CreateNtupleIColumn("detabsMuondecay");  // 9
-  analysisManager->CreateNtupleDColumn("Layer");  // 10
-  analysisManager->CreateNtupleDColumn("EvID");  // 11
-  analysisManager->CreateNtupleDColumn("absopiondecay");  // 12
-  analysisManager->CreateNtupleDColumn("gappiondecay");  // 13
-  analysisManager->CreateNtupleDColumn("theta"); // 14
-  analysisManager->CreateNtupleDColumn("phi");  // 15
-  analysisManager->CreateNtupleDColumn("energy");  // 16
-  analysisManager->CreateNtupleDColumn("px");  // 17
-  analysisManager->CreateNtupleDColumn("py");  // 18
-  analysisManager->CreateNtupleDColumn("pz");  // 19
-  analysisManager->CreateNtupleDColumn("x");   // 20
-  analysisManager->CreateNtupleDColumn("y");   // 21
-  analysisManager->CreateNtupleDColumn("z");   // 22
-  analysisManager->CreateNtupleDColumn("scintPionPassed");  // 23
-  analysisManager->CreateNtupleDColumn("detabsPionPassed");  // 24
-  analysisManager->CreateNtupleDColumn("gapPionPassed");  // 25
-  analysisManager->CreateNtupleDColumn("scintPionCapture"); //26
-  analysisManager->CreateNtupleDColumn("detabsPionCapture"); // 27
+  analysisManager->CreateNtupleDColumn("Eabs");
+  analysisManager->CreateNtupleDColumn("Egap");
+  analysisManager->CreateNtupleDColumn("Labs");
+  analysisManager->CreateNtupleDColumn("Lgap");
+  analysisManager->CreateNtupleIColumn("scintPiondecay");
+  analysisManager->CreateNtupleIColumn("detabsPiondecay");
+  analysisManager->CreateNtupleIColumn("scintMuondecay");
+  analysisManager->CreateNtupleIColumn("detabsMuondecay");
+  analysisManager->CreateNtupleDColumn("Layer");
+  analysisManager->CreateNtupleDColumn("EvID");
   analysisManager->FinishNtuple();
+*/    
+    fTreeManager->Book();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -111,8 +96,8 @@ mpdRunAction::~mpdRunAction()
 void mpdRunAction::BeginOfRunAction(const G4Run* /*run*/)
 { 
   //inform the runManager to save random number seed
-  //G4RunManager::GetRunManager()->SetRandomNumberStore(true);
-  
+ G4RunManager::GetRunManager()->SetRandomNumberStore(true);
+/*  
   // Get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
 
@@ -120,6 +105,7 @@ void mpdRunAction::BeginOfRunAction(const G4Run* /*run*/)
   //
   G4String fileName = "mpd";
   analysisManager->OpenFile(fileName);
+*/
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -128,6 +114,7 @@ void mpdRunAction::EndOfRunAction(const G4Run* /*run*/)
 {
   // print histogram statistics
   //
+/*
   auto analysisManager = G4AnalysisManager::Instance();
   if ( analysisManager->GetH1(1) ) {
     G4cout << G4endl << " ----> print histograms statistic ";
@@ -163,6 +150,9 @@ void mpdRunAction::EndOfRunAction(const G4Run* /*run*/)
   //
   analysisManager->Write();
   analysisManager->CloseFile();
+*/
+  fTreeManager->Save();
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

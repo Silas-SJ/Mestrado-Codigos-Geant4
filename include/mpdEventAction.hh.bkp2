@@ -24,50 +24,50 @@
 // ********************************************************************
 //
 // 
-/// \file mpdRunAction.hh
-/// \brief Definition of the mpdRunAction class
+/// \file mpdEventAction.hh
+/// \brief Definition of the mpdEventAction class
 
-#ifndef mpdRunAction_h
-#define mpdRunAction_h 1
+#ifndef mpdEventAction_h
+#define mpdEventAction_h 1
 
-#include "G4UserRunAction.hh"
+#include "G4UserEventAction.hh"
+
+#include "mpdCalorHit.hh"
+
 #include "globals.hh"
 
-class G4Run;
-
-/// Run action class
+/// Event action class
 ///
-/// It accumulates statistic and computes dispersion of the energy deposit 
-/// and track lengths of charged particles with use of analysis tools:
-/// H1D histograms are created in BeginOfRunAction() for the following 
-/// physics quantities:
-/// - Edep in absorber
-/// - Edep in gap
-/// - Track length in absorber
-/// - Track length in gap
-/// The same values are also saved in the ntuple.
-/// The histograms and ntuple are saved in the output file in a format
-/// accoring to a selected technology in mpdAnalysis.hh.
-///
-/// In EndOfRunAction(), the accumulated statistic and computed 
-/// dispersion is printed.
-///
-
-class mpdTreeManager;
-class mpdRunAction : public G4UserRunAction
+/// In EndOfEventAction(), it prints the accumulated quantities of the energy 
+/// deposit and track lengths of charged particles in Absober and Gap layers 
+/// stored in the hits collections.
+class mpdPrimaryGeneratorAction;
+class mpdEventAction : public G4UserEventAction
 {
-  public:
-    mpdRunAction(mpdTreeManager*);
-    virtual ~mpdRunAction();
+public:
+  mpdEventAction(mpdPrimaryGeneratorAction* ga);
+  virtual ~mpdEventAction();
 
-    virtual void BeginOfRunAction(const G4Run*);
-    virtual void   EndOfRunAction(const G4Run*);
+  virtual void  BeginOfEventAction(const G4Event* event);
+  virtual void    EndOfEventAction(const G4Event* event);
     
 private:
-    mpdTreeManager * fTreeManager;
+  // methods
+  mpdCalorHitsCollection* GetHitsCollection(G4int hcID,
+                                            const G4Event* event) const;
+  void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
+                            G4double gapEdep, G4double gapTrackLength) const;
+ 
+  mpdPrimaryGeneratorAction* genaction; 
+  // data members                   
+  G4int  fAbsHCID;
+  G4int  fGapHCID;
+  G4int  fScintHCID;
+  G4int fDetabsHCID;
 };
-
+                     
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 
+    

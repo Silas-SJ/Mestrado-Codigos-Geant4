@@ -42,10 +42,11 @@
 /// deposit and track lengths of charged particles in Absober and Gap layers 
 /// stored in the hits collections.
 class mpdPrimaryGeneratorAction;
+class mpdTreeManager;
 class mpdEventAction : public G4UserEventAction
 {
 public:
-  mpdEventAction(mpdPrimaryGeneratorAction* ga);
+  mpdEventAction(mpdPrimaryGeneratorAction*,mpdTreeManager*);
   virtual ~mpdEventAction();
 
   virtual void  BeginOfEventAction(const G4Event* event);
@@ -57,13 +58,16 @@ private:
                                             const G4Event* event) const;
   void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
                             G4double gapEdep, G4double gapTrackLength) const;
- 
-  mpdPrimaryGeneratorAction* genaction; 
+  mpdPrimaryGeneratorAction* genaction;
   // data members                   
-  G4int  fAbsHCID;
-  G4int  fGapHCID;
-  G4int  fScintHCID;
+  G4int fAbsHCID;
+  G4int fGapHCID;
+  G4int fScintHCID;
   G4int fDetabsHCID;
+  G4int fPmtHCID;
+  G4int fPmtHSCID;
+    
+    mpdTreeManager* fTreeManager;
 };
                      
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

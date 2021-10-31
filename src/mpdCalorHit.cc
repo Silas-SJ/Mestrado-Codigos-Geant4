@@ -45,11 +45,12 @@ mpdCalorHit::mpdCalorHit()
    fEdep(0.),
    fTrackLength(0.),
    fPionDecay(0),
-   fPionPassed(0),
-   fPionCapture(0),
    fMuonDecay(0),
-   fLayerID(-1)
-{}
+   fLayerID(-111),
+   fPionTrackIDContainer(-111),
+   fMuonTrackIDContainer(-111)
+{
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -64,9 +65,9 @@ mpdCalorHit::mpdCalorHit(const mpdCalorHit& right)
   fTrackLength = right.fTrackLength;
   fLayerID     = right.fLayerID;
   fPionDecay   = right.fPionDecay;
-  fPionPassed  = right.fPionPassed;
-  fPionCapture  = right.fPionCapture;
   fMuonDecay   = right.fMuonDecay;
+  fPionTrackIDContainer = right.fPionTrackIDContainer;
+  fMuonTrackIDContainer = right.fMuonTrackIDContainer;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -78,8 +79,8 @@ const mpdCalorHit& mpdCalorHit::operator=(const mpdCalorHit& right)
   fLayerID     = right.fLayerID;
   fPionDecay   = right.fPionDecay;
   fMuonDecay   = right.fMuonDecay;
-  fPionPassed  = right.fPionPassed;
-  fPionCapture = right.fPionCapture;
+  fPionTrackIDContainer = right.fPionTrackIDContainer;
+  fMuonTrackIDContainer = right.fMuonTrackIDContainer;
   return *this;
 }
 
@@ -94,14 +95,12 @@ G4bool mpdCalorHit::operator==(const mpdCalorHit& right) const
 
 void mpdCalorHit::Print()
 {
- /* (Teste)
   G4cout
      << "Edep: " 
      << std::setw(7) << G4BestUnit(fEdep,"Energy")
      << " track length: " 
      << std::setw(7) << G4BestUnit( fTrackLength,"Length")
      << G4endl;
-     */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

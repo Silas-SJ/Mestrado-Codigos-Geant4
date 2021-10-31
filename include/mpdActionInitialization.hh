@@ -34,21 +34,23 @@
 
 /// Action initialization class.
 ///
+class mpdTreeManager;
 class mpdDetectorConstruction;
-//class mpdPrimaryGeneratorAction;
+class mpdPrimaryGeneratorAction;
 class mpdActionInitialization : public G4VUserActionInitialization
 {
   public:
-   mpdActionInitialization(mpdDetectorConstruction*);
-  //  mpdActionInitialization(mpdPrimaryGeneratorAction* primgen);
+    mpdActionInitialization(mpdDetectorConstruction* detconst,mpdPrimaryGeneratorAction* primgen,mpdTreeManager* tree );
     virtual ~mpdActionInitialization();
 
     virtual void BuildForMaster() const;
     virtual void Build() const;
 
  private:
-  mpdDetectorConstruction* DetConst;
-   // mpdPrimaryGeneratorAction* PrimGen;
+    mpdDetectorConstruction* DetConst;
+    mpdPrimaryGeneratorAction* PrimGen;
+    mpdTreeManager* mpdTree;
+    
 };
 
 #endif
