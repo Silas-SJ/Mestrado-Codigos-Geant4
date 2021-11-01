@@ -82,15 +82,8 @@ void mpdTreeManager::Save()
 //void mpdTreeManager::FillNtuple(G4double energyAbs, G4double energyGap, G4double trackLAbs, G4double trackLGap, G4int Npe, G4double PMTCharge1[12], G4double PMTCharge2[12], G4double PMTMediumTime1[12], G4double PMTMediumTime2[12], G4double ScintCharge[12])
 //void mpdTreeManager::FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<G4double> ottv0, std::vector<G4double> ottv1)
 //void mpdTreeManager::FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::map<G4int,std::vector<G4double>> ottv)
-
-void mpdTreeManager::FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<G4int> otp, std::vector<G4double> ott, G4int PionPassed, G4int MuonPassed, G4int PionDecay, G4int MuonDecay)
-
-
-/* Desliguei esse aqui e editei o de cima.
 void mpdTreeManager::FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<G4int> otp, std::vector<G4double> ott)
-*/
-//void mpdTreeManager::FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::map<G4int,std::vector<G4double>> ott)
-
+//void mpdTreeManager::FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::map<G4int,std::vector<G4double>> ottv)
 {
 fTheta = theta;
 fPhi = phi;
@@ -106,10 +99,6 @@ fZ = z;
 //fOTTimeVector = ottv;
 fOTpmt=otp;
 fOTtime=ott;
-fPionPassed = PionPassed;
-fMuonPassed = MuonPassed; 
-fPionDecay = PionDecay;
-fMuonDecay = MuonDecay;
 /*
     fEabs = energyAbs;
     fEgap = energyGap;

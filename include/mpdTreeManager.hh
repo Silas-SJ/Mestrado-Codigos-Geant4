@@ -25,20 +25,9 @@ class mpdTreeManager
     void Save();
 //    void FillNtuple(G4double energyAbs, G4double energyGap, G4double trackLAbs, G4double trackLGap, G4int Npe, G4double PMTCharge1[12], G4double PMTCharge2[12], G4double PMTMediumTime1[12], G4double PMTMediumTime2[12], G4double ScintCharge[12]);
 //    void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<G4double> ottv0, std::vector<G4double> ottv1);
-//   void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::map<G4int,std::vector<G4double>> ottv); 
-
-   void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<G4int> ovp, std::vector<G4double> ott, G4int PionPassed, G4int MuonPassed, G4int PionDecay, G4int MuonDecay); 
-   
-
-
-
- /* Desliguei esse para editar em cima
-   void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<G4int> ovp, std::vector<G4double> ott); 
-   
- */   
-//   void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<std::pair<int,double>> otv); 
-
- 
+//   void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::map<G4int,std::vector<G4double>> ottv);  
+   void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<G4int> ovp, std::vector<G4double> ott);  
+//   void FillNtuple(G4double theta, G4double phi, G4double energy, G4double px, G4double py, G4double pz, G4double x, G4double y, G4double z, std::vector<std::pair<int,double>> otv);  
   private:
     TFile*   fRootFile;
     TTree*   fTree1;
@@ -48,7 +37,6 @@ class mpdTreeManager
     G4double fEnergy;
     G4double fPx, fPy, fPz;
     G4double fX, fY, fZ;
-
     
     G4double fEabs;
     G4double fEgap;
